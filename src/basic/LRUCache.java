@@ -69,5 +69,13 @@ public class LRUCache<K, V> {
         return null;
     }
 
-
+    /**
+     * Evicts the last item from cache, in case teh cache capacity is full.
+     */
+    private void evict() {
+        DoublyLinkedListNode<V> prevNode = tail.prev;
+        prevNode.next = null;
+        tail.prev = null;
+        tail = prevNode;
+    }
 }
