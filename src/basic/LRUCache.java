@@ -23,10 +23,10 @@ public class LRUCache<K, V> {
 
     /**
      * Item is not present in the cache, so we are adding it.
-     * 1. Add to the head of the DoublyLinkedList.
-     * 2. Put the node in the map.
+     * 1. Adds to the head of the DoublyLinkedList.
+     * 2. Puts the node in the map.
      */
-    public void add(K k, V v) {
+    public void put(K k, V v) {
         DoublyLinkedListNode<V> newNode = new DoublyLinkedListNode<>();
         newNode.data = v;
         newNode.next = head;
@@ -39,10 +39,31 @@ public class LRUCache<K, V> {
         map.put(k, newNode);
     }
 
+    /**
+     * If key 'k' is present in the Cache, then:-
+     * 1. get the node from DoublyLinkedList.
+     * 2. remove the node from between, and put the node in the beginning.
+     * Adjust the connections.
+     *
+     * @param k the key against which we need to fetch the value.
+     * @return
+     */
     public V get(K k) {
         DoublyLinkedListNode<V> node = map.get(k);
-        // move to front.
+        // move 'node' to front.
+        // X <--> node <-> Y, change it to X <-> Y
         if (node != null) {
+            DoublyLinkedListNode<V> x = node.prev;
+            DoublyLinkedListNode<V> y = node.next;
+            if (x != null) {
+                x.next = y;
+            }
+            if (y != null) {
+                y.prev = x;
+            }
+            node.next = head;
+            node.prev = null;
+            head = node;
             return node.data;
         }
         return null;
