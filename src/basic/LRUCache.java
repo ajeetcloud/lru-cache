@@ -12,16 +12,17 @@ class DoublyLinkedListNode<T> {
 public class LRUCache<K, V> {
 
     DoublyLinkedListNode<V> head;
-    DoublyLinkedListNode<V> tail; // TODO
-    Map<K, DoublyLinkedListNode<V>> map = new HashMap<>();
+    DoublyLinkedListNode<V> tail;
+    Map<K, DoublyLinkedListNode<V>> map;
 
     int capacity;
 
-    public LRUCache(int capacity){
-        head=null;
-        tail=null;
-        map=new HashMap<>();
-        this.capacity=capacity;
+    int size;
+
+    public LRUCache(int capacity) {
+        this.map = new HashMap<>();
+        this.capacity = capacity;
+        this.size = 0;
     }
 
     /**
@@ -30,26 +31,36 @@ public class LRUCache<K, V> {
      * 2. Puts the node in the map.
      */
     public void put(K k, V v) {
-        DoublyLinkedListNode<V> newNode = new DoublyLinkedListNode<>();
-        newNode.data = v;
-        newNode.next = head;
-        if (head == null) {
-            tail = newNode;
+        DoublyLinkedListNode<V> node = map.get(k);
+        if (node != null) {
+            // Node is present, so update the value.
+            node.data = v; // Update the value to 'v'.
+            get(k); // Brings the node to the head.
         } else {
-            head.prev = newNode;
+            // Creates a new node.
+            if (size == capacity) {
+                evict();
+            }
+            DoublyLinkedListNode<V> newNode = new DoublyLinkedListNode<>();
+            newNode.data = v;
+            newNode.next = head;
+            if (head == null) {
+                tail = newNode;
+            } else {
+                head.prev = newNode;
+            }
+            head = newNode;
+            map.put(k, newNode);
+            size++;
         }
-        head = newNode;
-        map.put(k, newNode);
     }
 
     /**
      * If key 'k' is present in the Cache, then:-
-     * 1. get the node from DoublyLinkedList.
-     * 2. remove the node from between, and put the node in the beginning.
-     * Adjust the connections.
-     *
-     * @param k the key against which we need to fetch the value.
-     * @return
+     * 1. Get the node from DoublyLinkedList.
+     * 2. Remove the node from between, and put the node in the beginning.
+     * 3. Adjust the connections.
+     * else return null.
      */
     public V get(K k) {
         DoublyLinkedListNode<V> node = map.get(k);
@@ -64,6 +75,7 @@ public class LRUCache<K, V> {
             if (y != null) {
                 y.prev = x;
             }
+            // Move the node to head, and update head.
             node.next = head;
             node.prev = null;
             head = node;
@@ -73,12 +85,13 @@ public class LRUCache<K, V> {
     }
 
     /**
-     * Evicts the last item from cache, in case teh cache capacity is full.
+     * Evicts the last item from cache, in case the cache capacity is full.
      */
     private void evict() {
         DoublyLinkedListNode<V> prevNode = tail.prev;
         prevNode.next = null;
         tail.prev = null;
         tail = prevNode;
+        size--;
     }
 }
