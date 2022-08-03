@@ -15,10 +15,13 @@ public class LRUCache<K, V> {
     DoublyLinkedListNode<V> tail; // TODO
     Map<K, DoublyLinkedListNode<V>> map = new HashMap<>();
 
-    public LRUCache() {
+    int capacity;
+
+    public LRUCache(int capacity) {
         head = null;
         tail = null;
         map = new HashMap<>();
+        this.capacity = capacity;
     }
 
     /**
