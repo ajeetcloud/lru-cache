@@ -17,11 +17,11 @@ public class LRUCache<K, V> {
 
     int capacity;
 
-    public LRUCache(int capacity) {
-        head = null;
-        tail = null;
-        map = new HashMap<>();
-        this.capacity = capacity;
+    public LRUCache(int capacity){
+        head=null;
+        tail=null;
+        map=new HashMap<>();
+        this.capacity=capacity;
     }
 
     /**
