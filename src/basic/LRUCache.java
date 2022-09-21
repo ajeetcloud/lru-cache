@@ -3,17 +3,18 @@ package basic;
 import java.util.HashMap;
 import java.util.Map;
 
-class DoublyLinkedListNode<T> {
-    DoublyLinkedListNode<T> prev;
-    DoublyLinkedListNode<T> next;
-    T data;
+class DoublyLinkedListNode<K, V> {
+    DoublyLinkedListNode<K, V> prev;
+    DoublyLinkedListNode<K, V> next;
+    K key;
+    V data;
 }
 
 public class LRUCache<K, V> {
 
-    DoublyLinkedListNode<V> head;
-    DoublyLinkedListNode<V> tail;
-    Map<K, DoublyLinkedListNode<V>> map;
+    DoublyLinkedListNode<K, V> head;
+    DoublyLinkedListNode<K, V> tail;
+    Map<K, DoublyLinkedListNode<K, V>> map;
 
     int capacity;
 
@@ -31,7 +32,7 @@ public class LRUCache<K, V> {
      * 2. Puts the node in the map.
      */
     public void put(K k, V v) {
-        DoublyLinkedListNode<V> node = map.get(k);
+        DoublyLinkedListNode<K, V> node = map.get(k);
         if (node != null) {
             // Node is present, so update the value.
             node.data = v; // Update the value to 'v'.
@@ -41,7 +42,8 @@ public class LRUCache<K, V> {
             if (size == capacity) {
                 evict();
             }
-            DoublyLinkedListNode<V> newNode = new DoublyLinkedListNode<>();
+            DoublyLinkedListNode<K, V> newNode = new DoublyLinkedListNode<>();
+            newNode.key = k;
             newNode.data = v;
             newNode.next = head;
             if (head == null) {
@@ -63,23 +65,27 @@ public class LRUCache<K, V> {
      * else return null.
      */
     public V get(K k) {
-        DoublyLinkedListNode<V> node = map.get(k);
-        // move 'node' to front.
-        // X <--> node <-> Y, change it to X <-> Y
+        DoublyLinkedListNode<K, V> node = map.get(k);
+        // move 'node' to head.
+        // c1 <-> c2 <-> c3, and 'c2' is the node to be found.
         if (node != null) {
-            DoublyLinkedListNode<V> x = node.prev;
-            DoublyLinkedListNode<V> y = node.next;
-            if (x != null) {
-                x.next = y;
+            DoublyLinkedListNode<K, V> c1 = node.prev;
+            DoublyLinkedListNode<K, V> c2 = node;
+            DoublyLinkedListNode<K, V> c3 = node.next;
+            if (c2 == head) {
+                return c2.data;
+            } else if (c2 == tail) {
+                c1.next = null;
+                tail = c1;
+            } else {
+                c1.next = c3;
+                c3.prev = c1;
             }
-            if (y != null) {
-                y.prev = x;
-            }
-            // Move the node to head, and update head.
-            node.next = head;
-            node.prev = null;
-            head = node;
-            return node.data;
+            head.prev = c2;
+            c2.next = head;
+            c2.prev = null;
+            head = c2; // Brings c2 to the head.
+            return c2.data;
         }
         return null;
     }
@@ -88,7 +94,8 @@ public class LRUCache<K, V> {
      * Evicts the last item from cache, in case the cache capacity is full.
      */
     private void evict() {
-        DoublyLinkedListNode<V> prevNode = tail.prev;
+        map.remove(tail.key);
+        DoublyLinkedListNode<K, V> prevNode = tail.prev;
         prevNode.next = null;
         tail.prev = null;
         tail = prevNode;
