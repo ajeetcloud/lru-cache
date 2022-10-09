@@ -1,7 +1,6 @@
 # lru-cache
 
 Here we implement a Generic LRU Cache in Java. You can read in detail about the implementation approach in my blog post:
--
 https://javaninja.io/designing-lru-cache
 
 The following operations are implemented in **O(1)**:-
